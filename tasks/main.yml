@@ -88,12 +88,8 @@
   lineinfile: >
     dest=/etc/bash.bashrc
     state=present
-    line='PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig'
-  become: yes
-
-- name: Ensure env vars are set
-  lineinfile: >
-    dest=/etc/bash.bashrc
-    state=present
-    line='export PKG_CONFIG_PATH'
+    line={{ item }}
+  with_items:
+    - 'PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig'
+    - 'export PKG_CONFIG_PATH'
   become: yes
