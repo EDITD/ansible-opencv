@@ -1,0 +1,95 @@
+- name: Install apt packages for OpenCV
+  apt: pkg={{ item }} state=present update_cache=yes cache_valid_time=3600
+  with_items:
+    - checkinstall
+    - cmake
+    - libgtk2.0-dev
+    - libjasper-dev
+    - libjpeg-dev
+    - libopencv-dev
+    - libqt4-dev
+    - libswscale-dev
+    - libtiff4-dev
+    - ocl-icd-opencl-dev
+    - pkg-config
+    - python-numpy
+    - unzip
+    - yasm
+  become: yes
+
+- name: Check if OpenCV is installed
+  stat: path=/usr/local/include/opencv
+  become: yes
+  register: opencv_package
+
+- name: Set opencv package exists fact
+  set_fact: opencv_package_exists={{ opencv_package.stat.exists }}
+  run_once: true
+
+- name: Ensure opencv directory is there
+  file: >
+    path={{ opencv_dir }}
+    state=directory
+    mode=0777
+  become: yes
+  when: not opencv_package_exists
+
+- name: Check if OpenCV source is there
+  stat: path={{ opencv_dir }}/source.zip
+  register: opencv_source
+  when: not opencv_package_exists
+
+- name: Download OpenCV source
+  get_url: >
+    url=https://github.com/opencv/opencv/archive/{{ opencv_commit }}.zip
+    dest={{ opencv_dir }}/source.zip
+  when: not opencv_package_exists
+
+- name: Unzip OpenCV source
+  unarchive: >
+    src={{ opencv_dir }}/source.zip
+    dest={{ opencv_dir }}
+    copy=no
+  when: not opencv_package_exists
+
+- name: Ensure opencv release directory is there
+  file: >
+    path={{ opencv_source_dir }}/release
+    state=directory
+  when: not opencv_package_exists
+
+- name: Cmake OpenCV
+  command: cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_QT=ON -D WITH_OPENGL=ON ..
+  args:
+    chdir: '{{ opencv_source_dir }}/release'
+  when: not opencv_package_exists
+
+- name: Make OpenCV
+  command: make
+  args:
+    chdir: '{{ opencv_source_dir }}/release'
+  when: not opencv_package_exists
+
+- name: Make install OpenCV
+  command: make install
+  args:
+    chdir: '{{ opencv_source_dir }}/release'
+  become: yes
+  when: not opencv_package_exists
+
+- name: ldconfig OpenCV
+  command: ldconfig
+  args:
+    chdir: '{{ opencv_source_dir }}/release'
+  become: yes
+  when: not opencv_package_exists
+
+- name: Ensure env vars are set
+  lineinfile: >
+    dest=/etc/bash.bashrc
+    state=present
+    line={{ item }}
+  with_items:
+    - 'PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig'
+    - 'export PKG_CONFIG_PATH'
+  become: yes
