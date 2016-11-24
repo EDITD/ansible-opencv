@@ -24,7 +24,6 @@
 
 - name: Set opencv package exists fact
   set_fact: opencv_package_exists={{ opencv_package.stat.exists }}
-  run_once: true
 
 - name: Ensure opencv directory is there
   file: >
