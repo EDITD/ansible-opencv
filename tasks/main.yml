@@ -9,7 +9,7 @@
     - libopencv-dev
     - libqt4-dev
     - libswscale-dev
-    - libtiff4-dev
+    - libtiff-dev
     - ocl-icd-opencl-dev
     - pkg-config
     - python-numpy
