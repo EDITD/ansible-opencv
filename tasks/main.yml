@@ -6,6 +6,7 @@
     - libgtk2.0-dev
     - libjasper-dev
     - libjpeg-dev
+    - liblapacke-dev
     - libopencv-dev
     - libqt4-dev
     - libswscale-dev
