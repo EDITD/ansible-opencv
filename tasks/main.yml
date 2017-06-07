@@ -65,7 +65,7 @@
   when: not opencv_package_exists
 
 - name: Make OpenCV
-  command: make --jobs $(($(nproc)-1))
+  command: make --jobs $(( $(nproc) - 1 ))
   args:
     chdir: '{{ opencv_source_dir }}/release'
   when: not opencv_package_exists
