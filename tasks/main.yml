@@ -6,6 +6,7 @@
     - libgtk2.0-dev
     - libjasper-dev
     - libjpeg-dev
+    - liblapacke-dev
     - libopencv-dev
     - libqt4-dev
     - libswscale-dev
@@ -58,13 +59,13 @@
   when: not opencv_package_exists
 
 - name: Cmake OpenCV
-  command: cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_QT=ON -D WITH_OPENGL=ON ..
+  command: cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_QT=ON -D WITH_OPENGL=ON {{ opencv_extra_cmake_options }} ..
   args:
     chdir: '{{ opencv_source_dir }}/release'
   when: not opencv_package_exists
 
 - name: Make OpenCV
-  command: make
+  shell: make --jobs $(( $(nproc) - 1 ))
   args:
     chdir: '{{ opencv_source_dir }}/release'
   when: not opencv_package_exists
