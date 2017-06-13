@@ -13,6 +13,7 @@
     - libtiff-dev
     - ocl-icd-opencl-dev
     - pkg-config
+    - python-dev
     - python-numpy
     - unzip
     - yasm
